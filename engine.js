@@ -24,26 +24,18 @@ app.get('/', (req, res) => {
     res.send('Node Engine rodando!')
 })
 
-app.get('/docker-ps', (req, res) => {
-    // 0 ID, 1 ContainerName, 2 Image, 3 Command, 4 Created, 5 Status, 6 Ports
-    let comm = spawn('docker', ["ps", "-a", "--format", "'{{.ID}}'\t'{{.Names}}'\t'{{.Image}}'\t'{{.Command}}'\t'{{.RunningFor}}'\t'{{.Status}}'\t'{{.Ports}}'\t"])
+app.get('/ps', (req, res) => {
+    let comm  = spawn('docker', ["ps", "-a", "--format", "json"])
     var lines = []
+    var out   = []
 
     comm.stdout.on('data',  (data) => {
-        let out = data.toString()
-        let col = []
+        out     = data.toString()
         let txt = ""
         for( let i = 0; i < out.length; i++ ) {
-            if( out[i] === "\t" ) {
-                //console.log(txt.replaceAll("'", ""))
-                col.push(txt.replaceAll("'", ""))
-                txt = ""
-                continue
-            }
             if( out[i] === "\n" ) {
-                lines.push(col)
+                lines.push(JSON.parse(txt))
                 txt = ""
-                col = []
                 continue
             }
             txt += out[i]
@@ -51,10 +43,114 @@ app.get('/docker-ps', (req, res) => {
     })
     comm.stdout.on("close", () => {
         //console.log(lines)
-        res.send(JSON.stringify(lines))
+        res.send({result: lines})
+    })
+})
+
+app.get('/images', (req, res) => {
+    let comm = spawn('docker', ["images", "-a", "--format", "json"])
+    var lines = []
+
+    comm.stdout.on('data',  (data) => {
+        let out = data.toString()
+        console.log(out)
+
+        let txt = ""
+
+        for( let i = 0; i < out.length; i++ ) {
+            if( out[i] === "\n" ) {
+                lines.push(JSON.parse(txt))
+                txt = ""
+                continue
+            }
+            txt += out[i]
+        }
+    })
+    comm.stdout.on("close", () => {
+        res.send({result: lines})
+    })
+})
+
+app.get('/volume-ls', (req, res) => {
+    let comm = spawn('docker', ["volume", "ls", "--format", "json"])
+    var lines = []
+
+    comm.stdout.on('data',  (data) => {
+        let out = data.toString()
+        console.log(out)
+
+        let txt = ""
+
+        for( let i = 0; i < out.length; i++ ) {
+            if( out[i] === "\n" ) {
+                lines.push(JSON.parse(txt))
+                txt = ""
+                continue
+            }
+            txt += out[i]
+        }
+    })
+    comm.stdout.on("close", () => {
+        res.send({result: lines})
+    })
+})
+
+app.get('/network-ls', (req, res) => {
+    let comm = spawn('docker', ["network", "ls", "--format", "json"])
+    var lines = []
+
+    comm.stdout.on('data',  (data) => {
+        let out = data.toString()
+        console.log(out)
+
+        let txt = ""
+
+        for( let i = 0; i < out.length; i++ ) {
+            if( out[i] === "\n" ) {
+                lines.push(JSON.parse(txt))
+                txt = ""
+                continue
+            }
+            txt += out[i]
+        }
+    })
+    comm.stdout.on("close", () => {
+        res.send({result: lines})
+    })
+})
+
+app.get('/start', (req, res) => {
+    if( req.query.id.length <= 0 ) {
+        return
+    }
+
+    let comm = spawn('docker', ["start", req.query.id])
+    var out  = ""
+
+    comm.stdout.on('data',  (data) => {
+        out = data.toString()
+    })
+    comm.stdout.on("close", (code) => {
+        res.send(JSON.stringify({result: out, command: "docker stop " + req.query.id, code: code}))
+    })
+})
+
+app.get('/stop', (req, res) => {
+    if( req.query.id.length <= 0 ) {
+        return
+    }
+
+    let comm = spawn('docker', ["stop", req.query.id])
+    var out  = ""
+
+    comm.stdout.on('data',  (data) => {
+        out = data.toString()
+    })
+    comm.stdout.on("close", (code) => {
+        res.send(JSON.stringify({result: out, command: "docker stop " + req.query.id, code: code}))
     })
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`API funcionando na porta ${port}`)
 })
