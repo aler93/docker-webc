@@ -19,11 +19,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="c in containers" :class="c.selected ? 'table-success' : ''">
-                <td>{{ c[1] }}</td>
+              <tr v-for="c in containers" :class="c.selected ? 'table-success' : ''" v-on:click="select(c)">
+                <td>{{ c.Names }}</td>
                 <td class="text-end">
-                  <button class="btn btn-danger" v-if="c.selected" v-on:click="select(c)">X</button>
-                  <button class="btn btn-primary" v-else v-on:click="select(c)">V</button>
+                  <button class="btn btn-danger" v-if="c.selected">X</button>
+                  <button class="btn btn-primary" v-else>V</button>
                 </td>
               </tr>
             </tbody>
@@ -47,13 +47,13 @@ export default {
     return{
       groupName: "",
       //group: {},
+      groups: []
     }
   },
   props: {
     containers: Array
   },
   mounted() {
-    //console.log("TableContainers")
   },
   methods: {
     createGroup() {

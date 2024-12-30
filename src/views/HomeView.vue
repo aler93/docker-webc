@@ -20,21 +20,21 @@
         </thead>
         <tbody>
           <tr class="align-middle" v-for="c in containers">
-            <td>{{c[1]}}</td>
-            <td>{{c[6]}}</td>
-            <td>{{c[4]}}</td>
-            <td>{{c[5]}}</td>
-            <td>{{c[2]}}</td>
+            <td>{{ c.Names }}</td>
+            <td>{{ c.Ports }}</td>
+            <td>{{ c.RunningFor }}</td>
+            <td>{{ c.Status }}</td>
+            <td>{{ c.Image }}</td>
             <td class="text-end">
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Ações
                 </button>
                 <ul class="dropdown-menu">
-                  <li v-if="c[7]"><a class="dropdown-item">Parar</a></li>
+                  <li v-if="c.State === 'running'"><a class="dropdown-item">Parar</a></li>
                   <li v-else><a class="dropdown-item">Iniciar</a></li>
 
-                  <li v-if="c[7]"><a class="dropdown-item">Reiniciar</a></li>
+                  <li v-if="c.ID !== 'running'"><a class="dropdown-item">Reiniciar</a></li>
 
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item">Remover</a></li>
@@ -46,7 +46,7 @@
       </table>
 
       <div class="mt-2" v-else>
-        <div class="card border border-dark mb-3" v-for="g in groups">
+        <div class="card border border-dark mt-3" v-for="g in groups">
           <div class="card-header bg-dark">
             <h5 class="text-white mb-0"> {{ g.name }} </h5>
           </div>
@@ -61,7 +61,7 @@
               </thead>
               <tbody>
                 <tr v-for="c in g.containers">
-                  <td>{{ c[1] }}</td>
+                  <td>{{ c.Names }}</td>
                   <td></td>
                   <td></td>
                 </tr>
@@ -121,17 +121,8 @@ export default {
       }
     },
     ps() {
-      axios.get(this.api + "/docker-ps").then( (r) => {
-        let cont = r.data
-        for( let i = 0; i < cont.length; i++ ) {
-          if(cont[i][5].includes("Up")) {
-            cont[i][7] = true
-          } else {
-            cont[i][7] = false
-          }
-        }
-
-        this.containers = cont
+      axios.get(this.api + "/ps").then( (r) => {
+        this.containers = r.data.result
       })
     },
     start(id) {},
