@@ -18,7 +18,16 @@ export default {
 </script>
 
 <style lang="scss">
+@import url('https://fonts.googleapis.com/css?family=Inconsolata|Oswald');
+
 .strong {
   font-weight: 600 !important;
+}
+
+.material-icons {
+  vertical-align: middle;
+  line-height: 0 !important;
+  position: relative;
+  top: -1px;
 }
 </style>

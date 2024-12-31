@@ -131,7 +131,23 @@ app.get('/start', (req, res) => {
         out = data.toString()
     })
     comm.stdout.on("close", (code) => {
-        res.send(JSON.stringify({result: out, command: "docker stop " + req.query.id, code: code}))
+        res.send(JSON.stringify({result: out, command: "docker start " + req.query.id, code: code}))
+    })
+})
+
+app.get('/restart', (req, res) => {
+    if( req.query.id.length <= 0 ) {
+        return
+    }
+
+    let comm = spawn('docker', ["restart", req.query.id])
+    var out  = ""
+
+    comm.stdout.on('data',  (data) => {
+        out = data.toString()
+    })
+    comm.stdout.on("close", (code) => {
+        res.send(JSON.stringify({result: out, command: "docker restart " + req.query.id, code: code}))
     })
 })
 

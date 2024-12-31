@@ -22,8 +22,12 @@
               <tr v-for="c in containers" :class="c.selected ? 'table-success' : ''" v-on:click="select(c)">
                 <td>{{ c.Names }}</td>
                 <td class="text-end">
-                  <button class="btn btn-danger" v-if="c.selected">X</button>
-                  <button class="btn btn-primary" v-else>V</button>
+                  <button class="btn btn-danger" v-if="c.selected">
+                    <i class="material-icons">cancel</i>
+                  </button>
+                  <button class="btn btn-primary" v-else>
+                    <i class="material-icons">check</i>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -79,7 +83,7 @@ export default {
         return
       }
 
-      let current = JSON.parse(localStorage.getItem("groups"))
+      let current = JSON.parse(localStorage.getItem("dockercli_groups"))
       if(current == null) {
         current = []
       }
@@ -88,10 +92,15 @@ export default {
         containers: selected,
       })
 
-      localStorage.setItem("groups", JSON.stringify(current))
+      localStorage.setItem("dockercli_groups", JSON.stringify(current))
       Swal.fire({
         icon: "success",
         title: "Grupo salvo"
+      }).then( () => {
+        let groups = JSON.parse(localStorage.getItem("dockercli_groups"))
+        if( groups ) {
+          this.groups = groups
+        }
       })
 
       for( let i = 0; i < this.containers.length; i++ ) {
